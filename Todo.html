@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>To-do list</title>
+        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+        <style>
+            * {
+                margin: 0;
+                border: 0;
+                text-align: center;
+            }
+            #flex {
+                display: flex;
+                display: inline-block;
+                background-color: grey;
+                padding: 20px;
+                margin-top: 150px;
+                border-radius: 1em;
+            }
+
+            #flex1 {
+                display: flex;
+                display: inline-block;
+                background-color: grey;
+                padding: 20px;
+                border-radius: 1em;
+            }
+
+            body {
+                background-image: url(bg1.jpg);
+                background-position: center;
+                background-repeat: no-repeat;
+                min-height: 700px;
+            }
+            h3 {
+                text-align: left;
+                color: white;
+            }
+            h1,h2 {
+                color: white;
+                text-decoration:double;
+                text-align: center;
+            }
+            button,input {
+                border-radius: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="head1"></div><br>
+        <div id="rec"></div>
+        
+    </body>
+    <script type="text/babel">
+
+        class RecycleBin extends React.Component {
+            constructor(props) {
+                super(props)
+                this.state={taskList:[this.props.task],ind:-1}
+            }
+
+            render() {
+                return (
+                    <div id="flex1">
+                        <h2>Recycle Bin</h2>
+                        <br/>
+                        <table>
+                            <thead>
+                                {this.state.taskList.map((taskList,index) =>
+                                    <tr key={index}>
+                                        <th><h3>{taskList}</h3></th>
+                                        <th><button type="button" value={index} onClick={this.delete} >Delete</button></th>
+                                        <th><button type="button" value={index} onClick={this.restore} >restore</button></th>                  
+                                    </tr>
+                                )}  
+                            </thead>  
+                        </table><br/><br/>
+                    </div>
+                );
+            }
+        }
+
+        class Todo extends React.Component{
+            constructor(props) {
+                super(props)
+                this.state={ taskList:[],ind:-1,delList:[],timeList:[] }
+            }
+            
+            getData = () => {
+			fetch('test.json') 
+			.then(resp => resp.json())
+			.then(data => {
+			    // console.log(data[1]);
+                // console.log(data[2]);
+				this.setState({taskList:data[1]});
+                this.setState({timeList:data[2]});
+			    });
+		    }
+
+            componentDidMount() {
+                this.getData()
+                this.interval = setInterval(() => {
+                    let index = 0;
+                    while ( index < this.state.taskList.length) {
+                        var t = new Date()
+                        var time = t.getHours() + ":" + t.getMinutes() + ":" + t.getSeconds();
+                        if (time > this.state.timeList[index] ){
+                            alert("Task " +index + " is about to be deleted")
+                            this.state.taskList.splice(index,1)
+                            this.setState( {taskList:[...this.state.taskList] })
+                            this.state.timeList.splice(index,1)
+                            this.setState( {timeList:[...this.state.timeList] })
+                        }  
+                        index++                     
+                    }
+                }, 1000);
+
+            }
+            componentWillUnmount() {
+                clearInterval(this.interval);
+            }
+
+            render() {
+                return (
+                    <div id="flex">
+                        <h1>Tasks</h1><br/>
+                        <h2>Remaining tasks: {this.state.taskList.length}</h2>
+                        <br/>
+                        <table>
+                            <thead>
+                                {this.state.taskList.map((taskList,index) =>
+                                    <tr key={index}>
+                                        <th><h3>{taskList}</h3></th>
+                                        <th><button type="button" id={index} value={index} onClick={this.delete} >Delete</button></th>
+                                        <th><button type="button" value={index} onClick={this.edit} >edit</button></th>                  
+                                    </tr>
+                                )}  
+                            </thead>  
+                        </table><br/><br/>
+                        <input type="text" id="input" placeholder="Enter Task"/> &nbsp;
+                        <input type="text" id="time" placeholder="HH:MM:SS"/> <br/><br/>
+                        <button type="button" onClick={this.Add} >Add Task</button>&nbsp;
+                        <button type="button" onClick={this.update} >Update</button>
+                    </div>
+                );
+            }
+            delete = (ele) => {
+                const index = ele.target.value
+                alert("Task " +index + " is about to be deleted")
+                this.state.taskList.splice(index,1)
+                this.setState( {taskList:[...this.state.taskList] })
+                this.state.timeList.splice(index,1)
+                this.setState( {timeList:[...this.state.timeList] })
+                // ReactDOM.render(<RecycleBin task={del1}/>,document.getElementById("rec"))
+            }
+            Add = () => {
+                var input = document.getElementById("time").value
+                this.setState( {timeList:[...this.state.timeList,input]})
+                var input = document.getElementById("input").value
+                this.setState( {taskList:[...this.state.taskList,input]})
+                document.getElementById("input").value = "" 
+                document.getElementById("time").value = ""   
+            }
+            edit = (ele) => {
+                var input = this.state.taskList[ele.target.value]
+                var time = this.state.timeList[ele.target.value]
+                document.getElementById("input").value = input
+                document.getElementById("time").value = time
+                this.setState({ind: ele.target.value})
+            }
+            update = () => {
+                var up = document.getElementById("input").value
+                var index = this.state.ind
+                if (index != -1) {
+                    this.state.taskList.splice(index,1,up)
+                    this.setState( {taskList:[...this.state.taskList] })
+                    document.getElementById("input").value = ""
+                    document.getElementById("time").value = "" 
+                    this.setState({ind:-1})
+                }
+            }
+        }
+        ReactDOM.render(<Todo />,document.getElementById("head1"))
+    </script>
+</html>

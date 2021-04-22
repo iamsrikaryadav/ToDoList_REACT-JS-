@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test</title>
+        <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    
+        <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        <style>
+            button {
+                border-radius: 1em;
+                background-color: aqua;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="test"></div>
+        <div id="ans"></div>
+    </body>
+    <script type="text/babel">
+        class Display extends React.Component {
+
+            render() {
+                return (
+                    <div>
+                        <h3>Lenght in  Meters: {this.props.answer}</h3>
+                    </div>
+                )
+            }
+            change = (ele) => {
+                this.setState({yard:ele.target.value})
+            }
+            cal = () => {
+                var meter = Number(this.state.yard) * 0.9144
+                ReactDOM.render(<Display ans={meter}/>,document.getElementById("ans"))
+            }
+        }
+
+        class Convertor extends React.Component {
+            constructor(props) {
+                super(props)
+                this.state = {yard:0}
+            }
+            render() {
+                return (
+                    <div id="flex">
+                        <h1>Yards to Meter</h1>
+                        <input type="number" onChange={this.change} placeholder="Enter the Length" name="len" />&nbsp;
+                        <button type="button" onClick={this.cal} >Calculate</button>
+                    </div>
+                )
+            }
+            change = (ele) => {
+                this.setState({yard:ele.target.value})
+            }
+            cal = () => {
+                var meter = Number(this.state.yard) * 0.9144
+                ReactDOM.render(<Display answer={meter}/>,document.getElementById("ans"))
+            }
+        }
+        ReactDOM.render(<Convertor/>,document.getElementById("test"))
+    </script>
+</html>
