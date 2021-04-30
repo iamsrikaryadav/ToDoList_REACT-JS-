@@ -1,156 +1,272 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <title>To list</title>
-</head>
-<body>
-            <div id="app" />
-                <script type="text/babel">
-                    class App extends React.Component {
-                        constructor(props) {
-                            super(props);
-                            this.state = {
-                            tasks:[],
-                            input: "",
-                            period:[],
-                            count:0,
-                            index:-1,
-                            restore:[]
-                            };
-                        }
-                        render() {
-                            return (
-                                <div class='center'>
-                                    <h1>To-Do-List</h1> 
-                                    <div class="container-fluid">
-                                        <div  class="row">
-                                            <div class="col-sm-6 addList" >
-                                                <table id="tasktable"   class="table table-hover" >
-                                                    <tbody>
-                                                        <div>
-                                                            <input onChange={this.UpdateResponse} value={this.state.input}/>
-                                                            <button onClick={this.addTask} class="btn btn-success"> Add Task</button>
-                                                        </div> 
-                                                        {this.state.tasks.map((task,i) =>
-                                                            <tr class="d" key={i}>
+    <head>
+        <title>ToDoList</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+        <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+        <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css">
+       
+    </head>
 
-                                                                <td> {task}</td>
-                                                                <td> {this.state.period}</td>
-                                                                <td>
-                                                                    <button  onClick={(event)=>{this.deleteTask(event,i)}}class="btn btn-danger"><i class="far fa-thumbs-up" aria-hidden="true"></i> remove</button>
-                                                                </td>
-                                                                <td> <button onClick={(event)=>{this.edit(event,i)}} class="btn btn-primary"> Edit </button> </td>
-                                                                <td><button onClick={this.Update} class="btn btn-warning"> Update </button></td>
-                                                            </tr>
-                                                        )} 
-                                                    </tbody>
-                                                    <h2> Number of tasks: {this.state.tasks.length}</h2>
-                                                </table>
-                                            </div>
-                                            <div class="col-sm-6 bin">
-                                                <table id="1">
-                                                    <thead>
-                                                        <h4 > Recycle Bin  </h4>
-                                                    </thead>
-                                                    <tbody>
-                                                        {this.state.restore.map((task,i) =>
-                                                            <tr class="d" key={i}>
-                                                                <td> {task}</td> &nbsp; &nbsp;
-                                                                <td> {this.state.period}</td>
-                                                                <td>
-                                                                <button  onClick={(event)=>{this.delete(event,i)}} class="btn"> <i class="fa fa-trash"></i></button> &nbsp;&nbsp;
-                                                                </td>
-                                                                <td>
-                                                                <button  onClick={(event)=>{this.restore(event,i)}} class="btn"> <i class="fa fa-folder"></i> Restore</button>
-                                                                </td>
-                                                            </tr>
-                                                        )}  
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        }
-                        restore=(event,i)=>{
+    <body> 
+        
+        <div id="list"></div>
+        <div id="list_recl"></div>
 
-                            var n=[...this.state.restore]
-                            this.state.tasks=[...this.state.tasks,n.splice(i,1)]
-                            this.setState(state=>({
-                            restore:n,
-                            }));
-                            console.log(this.state.restore)
+        <script type="text/babel">
+            class ToDoList extends React.Component{
 
-                        }
-                        delete=(event)=>{
-                            var index =event.target.value
-                                var tasks_list= this.state.restore.splice(index, 1);
-                                this.setState({restore: this.state.restore});
-                                } 
-                        UpdateResponse=(event)=>{
-                            this.setState({
-                            input:event.target.value,
-                            });
-                        }
-                        addTask=(event)=>{
-                            if(this.state.input==""){
-                                    return;
-                                }
-                            this.setState(state=>({
-                            tasks:[...state.tasks,state.input],
-                            input:""
-                            }));
-                        }
-                        deleteTask=(event,i)=>{
-                            var n=[...this.state.tasks]
-                            this.state.restore=[...this.state.restore,n.splice(i,1)]
-                            this.setState(state=>({
-                            tasks:n,
-                            }));
-                            console.log(this.state.restore)
-                        }
-                        edit=(event,i)=>{
-                            this.setState({
-                            input:this.state.tasks[i],
-                            index:i
-                            })
-                        }
-                        Update=()=>{
-                            var n=[...this.state.tasks]
-                            n[this.state.index]=this.state.input
-                            this.setState({
-                            tasks:n,
-                            input:""
-                            })
-                        }
-                        gettasks = () => {
-                                fetch('test.json') 
-                                .then(resp => resp.json())
-                                .then(data => {
-                                    console.log(data[1]);
-                                    this.setState({tasks:data[1]});
-                                });
-                            }
-                            componentDidMount(){
-                                this.gettasks();
-                            }
+                constructor(props) {
+                    super(props);
+                    this.state= { 
+                        tasks:[],//["Task 1","Task 2","Task 3"],
+                        input:"",
+                        upd:false,
+                        tid:"",
+                        timelst:[],//["18:46:00","18:56:20","18:46:40"],
+                        inputtime:"",
+                        dellst:[],
+                        deltime:[],
+                        empty:""
+
                     }
-                    ReactDOM.render(<App />, document.querySelector("#app"));
-                </script>
-        </div>
-    </div>
-</body>
+
+                }
+
+
+                render(){
+                    if (this.state.upd){
+                        var butn =<button onClick={this.updTask} class="btn btn-warning"> Update Task</button>
+                    }
+                    else{
+                        var butn =<button onClick={this.addTask} class="btn btn-success"> Add Task</button>
+                    }
+
+                    const tasklistp = this.state.tasks;
+
+                    return(
+                        <div class='center'>
+                            
+                            <div class="container-fluid">
+                                
+                                <div  class="row">
+                                    <div class="col-sm-6 addList" >
+                                    <h1>Tasks</h1>
+                                        <table id="tasktable"   class="table table-hover" >
+                                            <tbody>
+                                                <div>
+                                                    <label for= "inpt"> Todo Task : </label>{'\u00A0'}{'\u00A0'}
+                                                    <input id ="inpt" onChange={this.updateinpt} value={this.state.input} type="text" placeholder="Enter the task"></input><br/>
+                                                    <label for= "timeinput">End Time : </label>{'\u00A0'}{'\u00A0'}
+                                                    <input id ="timeinpt" onChange={this.updatetimeinpt} value={this.state.inputtime} type="text" placeholder="Enter in HH:MM:SS"></input><br/>
+                                                    {butn}
+                                                </div>
+                                                    
+                                                    {this.state.tasks.map((task,i)=>
+                                                        <tr key={i}>
+                                                            <td><h5>{task}  {'\u00A0'}{'\u00A0'}{this.state.timelst[i]} </h5> </td>
+                                                            <td>
+                                                                <button id={i} onClick={() => this.deleteTask(i)}class="btn btn-danger"><i class="fa fa-times" aria-hidden="true"></i></button>
+                                                            </td>
+                                                            <td>   
+                                                                <button id={i} onClick={() => this.updateTask(i)} class="btn btn-warning" > <i class="fa fa-refresh" aria-hidden="true"></i>  </button>
+                                                            </td>
+                                                        </tr>
+                                                    )}
+                                            </tbody>
+                                            <h2> Number of tasks: {this.state.tasks.length}</h2>
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-6 bin">
+                                        <table id="1" class="table table-hover" >
+                                            <thead>
+                                                <h1>Recycle Bin</h1>
+                                            </thead>
+                                            <tbody>
+                                                {this.state.dellst.map((tsk,i) =>
+                                                    <tr key={i}>
+                                                        <td>{tsk} {'\u00A0'}{this.state.deltime[i]} </td>&nbsp;&nbsp;
+                                                        <td><button id={i} onClick={() => this.recldeleteTask(i)} class="btn btn-danger"> <i class="fa fa-trash"></i> </button></td>
+                                                        <td><button id={i} onClick={() => this.restoreTask(i)} class="btn btn-success"> <i class="fa fa-recycle" aria-hidden="true"></i> </button></td>
+                                                    </tr>
+                                                )}
+
+                                                <h1>{this.state.empty}</h1>
+
+                                            </tbody>
+                                        </table>  
+                                    </div> 
+                                </div>            
+                            </div>
+                        </div>
+                    );
+                }
+
+                updateinpt = (event) =>{
+                    this.setState({
+                        input: event.target.value
+                    })
+                }
+
+                updatetimeinpt = (event) =>{
+                    this.setState({
+                        inputtime: event.target.value
+                    })
+                }
+
+                addTask =() =>{
+                    this.setState(state=>({
+                        tasks: [...state.tasks,state.input],
+                        input:"",
+                        timelst: [...state.timelst,state.inputtime],
+                        inputtime:""
+                    }))                   
+                }
+
+                updTask =() =>{
+                    var tsks = this.state.tasks;
+                    var times =this.state.timelst;
+                    tsks[this.state.tid]=this.state.input
+
+                    times[this.state.tid]=this.state.inputtime
+                    
+                    this.setState(state=>({
+                        tasks:tsks,
+                        input:"",
+                        upd:false,
+                        id:"",
+                        inputtime:""
+                    }))                   
+                }
+
+                deleteTask = (id) =>{
+                    var lst = this.state.tasks
+                    var tmelst=this.state.timelst
+                    // console.log(id)
+                    console.log("exec")
+                    console.log(id)
+                    console.log(lst)
+                    alert("This task will get deleted")
+
+                    var timelem = tmelst.splice(id,1)
+                    var deltskl =lst.splice(id,1)
+                    var deltsk = deltskl[0]
+
+
+                    console.log(deltsk)
+
+                    this.setState(state=>({
+                        tasks:lst,
+                        timelst:tmelst,
+                        dellst:[...state.dellst,deltsk],
+                        deltime:[...state.deltime,timelem[0]]
+                    }))  
+
+                }
+
+
+                recldeleteTask = (id) =>{
+                    var lst = this.state.dellst
+                    
+                    // console.log(id)
+                    console.log("exec")
+                    console.log(id)
+                    console.log(lst)
+                    alert("This task will get deleted permanently")
+
+                    var deltsk =lst.splice(id,1)
+
+                    console.log(deltsk)
+
+                    
+                    this.setState(state=>({
+                        dellst:lst
+                    }))  
+
+                }
+
+
+                restoreTask = (id) =>{
+                    var delst = this.state.dellst
+                    var deltime = this.state.deltime
+                    console.log(id)
+
+                    var tme = deltime.splice(id,1)
+                    var deltsk = delst.splice(id,1)
+
+                    console.log(deltime)
+                    console.log(delst)
+
+                    this.setState(state=>({
+                        dellst:delst,
+                        deltime:deltime,
+                        tasks:[...state.tasks,deltsk[0]],
+                        timelst:[...state.timelst,tme[0]]
+                       
+                    }))
+                }
+
+
+                updateTask = (id) =>{
+                    var lst = this.state.tasks 
+                    var time = this.state.timelst
+                    // console.log(id)
+                    console.log("exec")
+                    console.log(id)
+                    console.log(lst)
+
+                    this.setState({
+                        tasks:lst,
+                        input:lst[id],
+                        upd:true,
+                        tid:id,
+                        inputtime:time[id]
+                    })
+                }
+
+                componentDidMount() {
+
+                    fetch(`test.json`)
+                    .then(response => response.json())
+                    .then(data => {this.setState({
+                            tasks: data.taskslst,
+                            timelst: data.timelst
+                        })
+                    })
+
+                    this.interval = setInterval(() => {
+                        let index = 0;
+
+                        while ( index < this.state.tasks.length) {
+                            var t = new Date()
+                            var time = ('0'+t.getHours()).substr(-2) + ":" + ('0'+t.getMinutes()).substr(-2) + ":" + ('0'+t.getSeconds()).substr(-2); ('0'+t.getSeconds()).substr(-2)
+                            if (time > this.state.timelst[index] ){  
+                                console.log(this.state.timelst[index], index,time)   
+                                console.log(this.state.timelst)                      
+                                this.deleteTask(index)
+                                // alert("Done")
+                                console.log(this.state.tasks,this.state.timelst)
+                            }  
+
+                            index++                     
+                        }
+                    }, 1000);                  
+
+                }
+
+            }
+            ReactDOM.render(<ToDoList/>,document.querySelector("#list"))
+        </script>
+
+    </body>
 </html>
